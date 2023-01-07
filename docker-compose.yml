@@ -1,0 +1,45 @@
+version: "3.2"
+
+services:
+  postgres:
+    image: postgres:10.0
+    hostname: postgres
+    ports:
+      - "127.0.0.1:15432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: bard
+      POSTGRES_PASSWORD: bard
+      POSTGRES_DATABASE: bard
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    hostname: mongo
+    networks:
+      - mongo_network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=bard
+      - MONGO_INITDB_ROOT_PASSWORD=bard
+    ports:
+      - "27017"
+    command: mongod --quiet --logpath /dev/null
+
+  server:
+    build:
+      context: ./sauk
+    ports:
+    - "127.0.0.1:5000:5000"
+    container_name: server
+    volumes:
+      - "./sauk/api:/usr/src/app/api"
+
+
+networks:
+  mongo_network:
+    driver: bridge
+
+  
+
+volumes:
+    postgres-data: {}
